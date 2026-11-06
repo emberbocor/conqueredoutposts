@@ -1,23 +1,26 @@
 package io.github.emberbocor.conqueredoutposts.mixin;
 
-import java.util.function.Consumer;
+import java.util.Map;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import io.github.emberbocor.conqueredoutposts.claim.OutpostClaims;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
 
 @Mixin(ChunkGenerator.class)
 abstract class ChunkGeneratorMixin {
-    @Redirect(method = "getMobsAt", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/StructureManager;fillStartsForStructure(Lnet/minecraft/world/level/levelgen/structure/Structure;Lit/unimi/dsi/fastutil/longs/LongSet;Ljava/util/function/Consumer;)V"))
-    private void conqueredoutposts$skipClaimedStarts(StructureManager structures, Structure structure, LongSet references, Consumer<StructureStart> consumer) {
-        structures.fillStartsForStructure(structure, references, OutpostClaims.unclaimedStarts(structures, structure, consumer));
+    @ModifyVariable(method = "getMobsAt", at = @At("STORE"), ordinal = 0)
+    private Map<Structure, LongSet> conqueredoutposts$skipClaimedStarts(Map<Structure, LongSet> references, Holder<Biome> biome,
+            StructureManager structures, MobCategory category, BlockPos pos) {
+        return OutpostClaims.withoutClaimedStarts(structures, references, category);
     }
 }

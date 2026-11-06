@@ -1,11 +1,14 @@
 package io.github.emberbocor.conqueredoutposts.claim;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import io.github.emberbocor.conqueredoutposts.config.ServerConfig;
 import io.github.emberbocor.conqueredoutposts.mixin.StructureManagerAccessor;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
@@ -14,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.StructureManager;
@@ -57,23 +61,40 @@ public final class OutpostClaims {
         }
     }
 
-    public static Consumer<StructureStart> unclaimedStarts(StructureManager structures, Structure structure, Consumer<StructureStart> consumer) {
-        if (!(((StructureManagerAccessor) structures).conqueredoutposts$getLevel() instanceof ServerLevel level)) {
-            return consumer;
+    /** The structure references at a position without the starts of claimed outposts whose spawn override applies. */
+    public static Map<Structure, LongSet> withoutClaimedStarts(StructureManager structures, Map<Structure, LongSet> references, MobCategory category) {
+        if (references.isEmpty() || !(((StructureManagerAccessor) structures).conqueredoutposts$getLevel() instanceof ServerLevel level)) {
+            return references;
         }
         ClaimData data = ClaimData.get(level);
         if (data.isEmpty()) {
-            return consumer;
+            return references;
         }
-        ResourceLocation id = structures.registryAccess().registryOrThrow(Registries.STRUCTURE).getKey(structure);
-        if (id == null || !ServerConfig.settings().structures().contains(id)) {
-            return consumer;
-        }
-        return start -> {
-            if (!isClaimed(level, data, key(id, start))) {
-                consumer.accept(start);
+        Registry<Structure> registry = structures.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        Set<ResourceLocation> claimable = ServerConfig.settings().structures();
+        Map<Structure, LongSet> result = references;
+        for (Map.Entry<Structure, LongSet> entry : references.entrySet()) {
+            ResourceLocation id = registry.getKey(entry.getKey());
+            if (id == null || !claimable.contains(id) || !entry.getKey().spawnOverrides().containsKey(category)) {
+                continue;
             }
-        };
+            LongSet unclaimed = null;
+            for (long start : entry.getValue()) {
+                if (isClaimed(level, data, new ClaimData.Key(id, start))) {
+                    if (unclaimed == null) {
+                        unclaimed = new LongOpenHashSet(entry.getValue());
+                    }
+                    unclaimed.remove(start);
+                }
+            }
+            if (unclaimed != null) {
+                if (result == references) {
+                    result = new LinkedHashMap<>(references);
+                }
+                result.put(entry.getKey(), unclaimed);
+            }
+        }
+        return result;
     }
 
     private static boolean isClaimed(ServerLevel level, ClaimData data, ClaimData.Key key) {

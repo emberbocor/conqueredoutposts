@@ -23,7 +23,7 @@ Available for NeoForge, Forge and Fabric.
 - **Ominous Banners do not count.** Placing an Ominous Banner (the white banner with the illager pattern) never claims an outpost. Renaming it does not change that.
 - **Only player banners count.** The banners that come with the outpost when it is generated never claim it, and neither do banners set with commands such as `/setblock`. Breaking a banner and placing it again yourself does count, unless it is an Ominous Banner.
 - **More banners.** You can place more than one claim banner in an outpost. The outpost stays claimed as long as at least one of them is still in place; extra banners do not show the message again.
-- **Losing the claim.** A claim banner is gone however it disappears: broken by a player, blown up, pushed by a piston, dropped because the block it stands or hangs on was removed, or replaced with `/setblock` or `/fill` by anything that is not a banner. When the last one is gone, the outpost is no longer claimed and spawns pillagers again.
+- **Losing the claim.** A claim banner is gone however it disappears: broken by a player, blown up, dropped because the block it stands or hangs on was removed or pushed away by a piston, or replaced with `/setblock` or `/fill` by anything that is not a banner. When the last one is gone, the outpost is no longer claimed and spawns pillagers again.
 - **Outpost farms are safe.** Nothing changes for an outpost nobody has claimed, so pillager farms built at unclaimed outposts keep working.
 - **What stays vanilla:** pillager patrols, raids, mob spawners, the pillagers that already live in the outpost, and the spawning rules of the biome.
 
