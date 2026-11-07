@@ -1,11 +1,11 @@
 Conquered Outposts includes the unmodified NightConfig core and toml libraries,
-version 3.8.0, by TheElectronWill and NightConfig contributors.
+version 3.6.4, by TheElectronWill and NightConfig contributors.
 
 NightConfig is licensed under the GNU Lesser General Public License version 3.
 The license texts are included in META-INF/licenses/.
 Source code for the bundled version:
-https://github.com/TheElectronWill/night-config/tree/v3.8.0
-https://github.com/TheElectronWill/night-config/archive/refs/tags/v3.8.0.zip
+https://github.com/TheElectronWill/night-config/tree/v3.6.4
+https://github.com/TheElectronWill/night-config/archive/refs/tags/v3.6.4.zip
 
 The libraries are separate nested jars in META-INF/jars/ and can be replaced
 with a compatible modified version. Conquered Outposts itself is MIT licensed;

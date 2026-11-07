@@ -31,14 +31,14 @@ Available for NeoForge, Forge and Fabric.
 
 | | NeoForge | Forge | Fabric |
 |---|---|---|---|
-| Minecraft | 1.21.1 | 1.21.1 | 1.21 or 1.21.1 |
-| Loader | NeoForge 21.1.1 or newer | Forge 52.0.0 or newer | Fabric Loader 0.15.11 or newer |
-| Other | | | Fabric API 0.102.0 or newer |
-| Jar | `conqueredoutposts-neoforge-1.21.1-<version>.jar` | `conqueredoutposts-forge-1.21.1-<version>.jar` | `conqueredoutposts-fabric-1.21-1.21.1-<version>.jar` |
+| Minecraft | 1.20.1 | 1.20.1 | 1.20 or 1.20.1 |
+| Loader | NeoForge 47.1.5 or newer | Forge 47.1.0 or newer | Fabric Loader 0.14.21 or newer |
+| Other | | | Fabric API 0.83.0 or newer |
+| Jar | `conqueredoutposts-forge-1.20.1-<version>.jar` | `conqueredoutposts-forge-1.20.1-<version>.jar` | `conqueredoutposts-fabric-1.20-1.20.1-<version>.jar` |
 
-On Minecraft 1.21.1, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your server's loader.
+On Minecraft 1.20.1, NeoForge and Forge use the same Forge jar. Pick that jar for either loader, or the Fabric jar for Fabric.
 
-The Fabric jar bundles [NightConfig](https://github.com/TheElectronWill/night-config) (core and toml, LGPL-3.0) to read the TOML config. NeoForge and Forge already ship it.
+The Fabric jar bundles [NightConfig 3.6.4](https://github.com/TheElectronWill/night-config/tree/v3.6.4) (core and toml, LGPL-3.0) to read the TOML config. NeoForge and Forge already ship it.
 
 ### Client and server
 
@@ -90,7 +90,7 @@ The world opens normally and every outpost spawns pillagers again, as in vanilla
 ./gradlew build
 ```
 
-The jars are written to `neoforge/build/libs/`, `forge/build/libs/` and `fabric/build/libs/`.
+The jars are written to `forge/build/libs/` and `fabric/build/libs/`.
 
 ## License
 

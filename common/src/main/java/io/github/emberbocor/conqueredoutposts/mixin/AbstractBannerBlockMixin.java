@@ -14,14 +14,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractBannerBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(Block.class)
-abstract class BlockMixin {
+@Mixin(AbstractBannerBlock.class)
+abstract class AbstractBannerBlockMixin {
     @Inject(method = "setPlacedBy", at = @At("HEAD"))
     private void conqueredoutposts$bannerPlaced(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack, CallbackInfo ci) {
-        if ((Object) this instanceof AbstractBannerBlock && placer instanceof Player && level instanceof ServerLevel serverLevel) {
+        if (placer instanceof Player && level instanceof ServerLevel serverLevel) {
             OutpostClaims.bannerPlaced(serverLevel, pos, stack);
         }
     }

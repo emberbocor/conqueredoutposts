@@ -9,7 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ServerConfig {
-    static final Settings DEFAULTS = new Settings(Set.of(ResourceLocation.withDefaultNamespace("pillager_outpost")), true);
+    static final Settings DEFAULTS = new Settings(Set.of(ResourceLocation.tryBuild("minecraft", "pillager_outpost")), true);
 
     private static volatile Settings settings = DEFAULTS;
 

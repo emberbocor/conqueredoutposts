@@ -12,25 +12,19 @@ import org.jetbrains.annotations.Nullable;
 import io.github.emberbocor.conqueredoutposts.ConqueredOutposts;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.saveddata.SavedData;
 
 final class ClaimData extends SavedData {
-    // Vanilla needs a data fix type; this one has no fixes for data saved by the running version.
-    private static final SavedData.Factory<ClaimData> FACTORY =
-            new SavedData.Factory<>(ClaimData::new, ClaimData::load, DataFixTypes.SAVED_DATA_RANDOM_SEQUENCES);
-
     private final Map<Key, Claim> claims = new HashMap<>();
 
     static ClaimData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(FACTORY, ConqueredOutposts.MODID);
+        return level.getDataStorage().computeIfAbsent(ClaimData::load, ClaimData::new, ConqueredOutposts.MODID);
     }
 
     boolean isEmpty() {
@@ -85,7 +79,7 @@ final class ClaimData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag tag) {
         ListTag list = new ListTag();
         claims.forEach((key, claim) -> {
             BoundingBox box = claim.box();
@@ -100,7 +94,7 @@ final class ClaimData extends SavedData {
         return tag;
     }
 
-    private static ClaimData load(CompoundTag tag, HolderLookup.Provider registries) {
+    private static ClaimData load(CompoundTag tag) {
         ClaimData data = new ClaimData();
         ListTag list = tag.getList("claims", Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {

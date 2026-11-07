@@ -11,7 +11,6 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +21,7 @@ import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.AbstractBannerBlock;
+import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -35,7 +35,7 @@ public final class OutpostClaims {
 
     public static void bannerPlaced(ServerLevel level, BlockPos pos, ItemStack banner) {
         Set<ResourceLocation> claimable = ServerConfig.settings().structures();
-        if (claimable.isEmpty() || isOminousBanner(level, banner)) {
+        if (claimable.isEmpty() || isOminousBanner(banner)) {
             return;
         }
         Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
@@ -113,10 +113,10 @@ public final class OutpostClaims {
         return level.isLoaded(pos) && !(level.getBlockState(pos).getBlock() instanceof AbstractBannerBlock);
     }
 
-    private static boolean isOminousBanner(ServerLevel level, ItemStack banner) {
-        ItemStack ominous = Raid.getLeaderBannerInstance(level.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN));
+    private static boolean isOminousBanner(ItemStack banner) {
+        ItemStack ominous = Raid.getLeaderBannerInstance();
         return banner.is(ominous.getItem())
-                && Objects.equals(banner.get(DataComponents.BANNER_PATTERNS), ominous.get(DataComponents.BANNER_PATTERNS));
+                && Objects.equals(BannerBlockEntity.getItemPatterns(banner), BannerBlockEntity.getItemPatterns(ominous));
     }
 
     private static ClaimData.Key key(ResourceLocation structure, StructureStart start) {
