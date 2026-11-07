@@ -12,7 +12,7 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
 import io.github.emberbocor.conqueredoutposts.ConqueredOutposts;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
 final class ServerConfigReader {
@@ -40,7 +40,7 @@ final class ServerConfigReader {
                 showMessages(config, defaults.showMessages()));
     }
 
-    private Set<ResourceLocation> structures(UnmodifiableConfig config, Set<ResourceLocation> fallback) {
+    private Set<Identifier> structures(UnmodifiableConfig config, Set<Identifier> fallback) {
         Object value = config.get("structures");
         if (value == null) {
             return fallback;
@@ -49,9 +49,9 @@ final class ServerConfigReader {
             warn("structures must be a list of structure ids, got '{}'; using {}", value, fallback);
             return fallback;
         }
-        Set<ResourceLocation> structures = new LinkedHashSet<>();
+        Set<Identifier> structures = new LinkedHashSet<>();
         for (Object entry : list) {
-            ResourceLocation id = entry instanceof String text ? ResourceLocation.tryParse(text) : null;
+            Identifier id = entry instanceof String text ? Identifier.tryParse(text) : null;
             if (id == null) {
                 warn("'{}' in structures is not a structure id, ignored", entry);
             } else if (!structureRegistry.containsKey(id)) {

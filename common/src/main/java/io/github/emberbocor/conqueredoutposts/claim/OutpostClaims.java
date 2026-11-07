@@ -14,7 +14,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MobCategory;
@@ -34,15 +34,15 @@ public final class OutpostClaims {
     }
 
     public static void bannerPlaced(ServerLevel level, BlockPos pos, ItemStack banner) {
-        Set<ResourceLocation> claimable = ServerConfig.settings().structures();
+        Set<Identifier> claimable = ServerConfig.settings().structures();
         if (claimable.isEmpty() || isOminousBanner(level, banner)) {
             return;
         }
-        Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        Registry<Structure> registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
         StructureManager structures = level.structureManager();
         ClaimData data = ClaimData.get(level);
         structures.getAllStructuresAt(pos).forEach((structure, references) -> {
-            ResourceLocation id = registry.getKey(structure);
+            Identifier id = registry.getKey(structure);
             if (id != null && claimable.contains(id)) {
                 structures.fillStartsForStructure(structure, references, start -> {
                     BoundingBox box = start.getBoundingBox();
@@ -70,11 +70,11 @@ public final class OutpostClaims {
         if (data.isEmpty()) {
             return references;
         }
-        Registry<Structure> registry = structures.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        Set<ResourceLocation> claimable = ServerConfig.settings().structures();
+        Registry<Structure> registry = structures.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+        Set<Identifier> claimable = ServerConfig.settings().structures();
         Map<Structure, LongSet> result = references;
         for (Map.Entry<Structure, LongSet> entry : references.entrySet()) {
-            ResourceLocation id = registry.getKey(entry.getKey());
+            Identifier id = registry.getKey(entry.getKey());
             if (id == null || !claimable.contains(id) || !entry.getKey().spawnOverrides().containsKey(category)) {
                 continue;
             }
@@ -114,12 +114,12 @@ public final class OutpostClaims {
     }
 
     private static boolean isOminousBanner(ServerLevel level, ItemStack banner) {
-        ItemStack ominous = Raid.getLeaderBannerInstance(level.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN));
+        ItemStack ominous = Raid.getOminousBannerInstance(level.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN));
         return banner.is(ominous.getItem())
                 && Objects.equals(banner.get(DataComponents.BANNER_PATTERNS), ominous.get(DataComponents.BANNER_PATTERNS));
     }
 
-    private static ClaimData.Key key(ResourceLocation structure, StructureStart start) {
+    private static ClaimData.Key key(Identifier structure, StructureStart start) {
         return new ClaimData.Key(structure, start.getChunkPos().toLong());
     }
 
