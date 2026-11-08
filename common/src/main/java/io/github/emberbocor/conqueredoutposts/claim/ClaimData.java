@@ -1,5 +1,7 @@
 package io.github.emberbocor.conqueredoutposts.claim;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,24 +18,65 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.emberbocor.conqueredoutposts.ConqueredOutposts;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 final class ClaimData extends SavedData {
     private static final Codec<ClaimData> CODEC = Entry.CODEC.listOf().fieldOf("claims").codec()
             .xmap(ClaimData::fromEntries, ClaimData::entries);
     // Vanilla needs a data fix type; this one has no fixes for 1.21.1 or newer data.
-    private static final SavedDataType<ClaimData> TYPE =
-            new SavedDataType<>(ConqueredOutposts.MODID, ClaimData::new, CODEC, DataFixTypes.SAVED_DATA_RANDOM_SEQUENCES);
+    private static final SavedDataType<ClaimData> TYPE = new SavedDataType<>(
+            Identifier.fromNamespaceAndPath(ConqueredOutposts.MODID, "claims"), ClaimData::new, CODEC, DataFixTypes.SAVED_DATA_RANDOM_SEQUENCES);
 
     private final Map<Key, Claim> claims = new HashMap<>();
 
     static ClaimData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(TYPE);
+        SavedDataStorage storage = level.getDataStorage();
+        ClaimData data = storage.get(TYPE);
+        if (data == null) {
+            data = readLegacy(level);
+            storage.set(TYPE, data);
+        }
+        return data;
+    }
+
+    /** Claims of a world from before 26.1: vanilla leaves that file in the old data folder of the dimension. */
+    private static ClaimData readLegacy(ServerLevel level) {
+        Path file = legacyFolder(level).resolve("data").resolve(ConqueredOutposts.MODID + ".dat");
+        if (Files.exists(file)) {
+            try {
+                return CODEC.parse(NbtOps.INSTANCE, NbtIo.readCompressed(file, NbtAccounter.unlimitedHeap()).get("data")).getOrThrow();
+            } catch (Exception e) {
+                ConqueredOutposts.LOGGER.error("Could not read the claims in {}", file, e);
+            }
+        }
+        return new ClaimData();
+    }
+
+    private static Path legacyFolder(ServerLevel level) {
+        Path root = level.getServer().getWorldPath(LevelResource.ROOT);
+        ResourceKey<Level> dimension = level.dimension();
+        if (dimension == Level.OVERWORLD) {
+            return root;
+        }
+        if (dimension == Level.NETHER) {
+            return root.resolve("DIM-1");
+        }
+        if (dimension == Level.END) {
+            return root.resolve("DIM1");
+        }
+        return dimension.identifier().resolveAgainst(root.resolve("dimensions"));
     }
 
     boolean isEmpty() {

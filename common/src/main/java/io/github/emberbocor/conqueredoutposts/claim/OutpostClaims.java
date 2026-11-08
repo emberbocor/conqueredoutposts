@@ -120,7 +120,7 @@ public final class OutpostClaims {
     }
 
     private static ClaimData.Key key(Identifier structure, StructureStart start) {
-        return new ClaimData.Key(structure, start.getChunkPos().toLong());
+        return new ClaimData.Key(structure, start.getChunkPos().pack());
     }
 
     private static void announce(ServerLevel level, BoundingBox box, Component message) {
@@ -129,7 +129,7 @@ public final class OutpostClaims {
         }
         for (ServerPlayer player : level.players()) {
             if (box.isInside(player.blockPosition())) {
-                player.displayClientMessage(message, true);
+                player.sendOverlayMessage(message);
             }
         }
     }
