@@ -75,7 +75,7 @@ showMessages = true
 
 ## Removing the mod
 
-The world opens normally and every outpost spawns pillagers again, as in vanilla. The banners stay where they are as normal banners. The mod's claim data stays in the world folder (`data/conqueredoutposts.dat` of each dimension); vanilla ignores it, and it does no harm. If you install the mod again, claims whose banners are still in place work again. The config file stays in `config/` until you delete it.
+The world opens normally and every outpost spawns pillagers again, as in vanilla. The banners stay where they are as normal banners. The mod's claim data stays in the world folder (`dimensions/minecraft/overworld/data/conqueredoutposts/claims.dat`, and the same file for each other dimension); vanilla ignores it, and it does no harm. If you install the mod again, claims whose banners are still in place work again. The config file stays in `config/` until you delete it.
 
 ## Compatibility
 
